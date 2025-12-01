@@ -44,7 +44,7 @@ export type ImgProps = NativeImgProps & {
   optixFlowConfig?: OptixFlowConfig;
 };
 
-type ForwardedImgProps = ImgProps & { forwardedRef: React.Ref<HTMLImageElement> };
+type ForwardedImgProps = ImgProps & { forwardedRef: React.Ref<HTMLImageElement | null> };
 
 const DEFAULT_WIDTHS = {
   sm: 640,
@@ -101,7 +101,7 @@ const parseDimension = (value: unknown): number | undefined => {
 
 const composeRefs = (
   hookRef: (node: HTMLImageElement | null) => void,
-  forwardedRef: React.Ref<HTMLImageElement>,
+  forwardedRef: React.Ref<HTMLImageElement | null>,
   localRef: React.RefObject<HTMLImageElement>,
 ) =>
   useCallback(
@@ -235,7 +235,7 @@ const LegacyImg: React.FC<ForwardedImgProps> = ({
 }) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const pictureRef = useRef<HTMLPictureElement | null>(null);
-  useImperativeHandle(forwardedRef, () => imgRef.current as HTMLImageElement | null);
+  useImperativeHandle(forwardedRef, () => imgRef.current);
   useResponsiveReset(pictureRef);
   useMediaSelectionEffect();
 
