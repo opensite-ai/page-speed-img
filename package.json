@@ -34,6 +34,7 @@
   },
   "author": "OpenSite AI (https://opensite.ai)",
   "license": "MIT",
+  "private": false,
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -42,6 +43,9 @@
     "dist"
   ],
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",
