@@ -91,6 +91,7 @@ const warnDeprecatedMediaId = (mediaId?: number) => {
 const isUrlString = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0;
 
 const parseDimension = (value: unknown): number | undefined => {
+  if (value === '' || value === null || typeof value === 'undefined') return undefined;
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string') {
     const numeric = Number(value);
@@ -180,8 +181,10 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
   const hasSrcSet = Boolean(srcset.avif || srcset.webp || srcset.jpeg);
   const imgSrc = src || normalizedSrc || TRANSPARENT_PIXEL;
   const inlineSrcSet = hasSrcSet && !srcset.avif && !srcset.webp ? srcset.jpeg : '';
-  const widthAttr = (width as any) ?? (size.width || numericWidth || undefined);
-  const heightAttr = (height as any) ?? (size.height || numericHeight || undefined);
+  const parsedWidth = parseDimension(width);
+  const parsedHeight = parseDimension(height);
+  const widthAttr = parsedWidth ?? (size.width || numericWidth || undefined);
+  const heightAttr = parsedHeight ?? (size.height || numericHeight || undefined);
 
   if (!hasSrcSet) {
     return (
