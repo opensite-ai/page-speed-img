@@ -1,6 +1,6 @@
 {
   "name": "@page-speed/img",
-  "version": "0.0.2",
+  "version": "0.1.4",
   "description": "Performance-optimized React Image component. Drop-in image implementation of web.dev best practices with zero configuration.",
   "keywords": [
     "react",
