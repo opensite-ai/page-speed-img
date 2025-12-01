@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@page-speed/hooks':
-        specifier: 0.4.1
-        version: 0.4.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        specifier: 0.4.2
+        version: 0.4.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react:
         specifier: '>=17.0.0'
         version: 19.2.0
@@ -429,8 +429,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@page-speed/hooks@0.4.1':
-    resolution: {integrity: sha512-0u/PNWcCEOVyfhfJTJiDFgvkimL1LOLj3LXVAUqp8fr2jxYt/1EZQMs5S/dplZ73g6DVpPZVRdWqRMNCGInYAQ==}
+  '@page-speed/hooks@0.4.2':
+    resolution: {integrity: sha512-P6IKEve2n0QxSQaPwSCg5moWf0jrvvRa448xM6qMvDCGx5c33Dx+W7BINwpEl/Csv1rS/+6oWkPB1KCNb6wSRA==}
     engines: {node: '>=18.0.0', pnpm: '>=9.0.0'}
     peerDependencies:
       react: '>=16.8.0'
@@ -1918,7 +1918,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@page-speed/hooks@0.4.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@page-speed/hooks@0.4.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
