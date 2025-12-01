@@ -1,0 +1,36 @@
+[
+  {
+    "name": "Full library",
+    "path": "dist/index.js"
+  },
+  {
+    "name": "useWebVitals",
+    "path": "dist/index.js",
+    "import": "{ useWebVitals }"
+  },
+  {
+    "name": "useLCP",
+    "path": "dist/index.js",
+    "import": "{ useLCP }"
+  },
+  {
+    "name": "useCLS",
+    "path": "dist/index.js",
+    "import": "{ useCLS }"
+  },
+  {
+    "name": "useINP",
+    "path": "dist/index.js",
+    "import": "{ useINP }"
+  },
+  {
+    "name": "useOptimizedImage",
+    "path": "dist/index.js",
+    "import": "{ useOptimizedImage }"
+  },
+  {
+    "name": "useDeferredMount",
+    "path": "dist/index.js",
+    "import": "{ useDeferredMount }"
+  }
+]
