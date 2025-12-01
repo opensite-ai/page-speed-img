@@ -1,1 +1,1 @@
-export { Img } from './Img.js';
+export { Img, setDefaultOptixFlowConfig } from './Img.js';

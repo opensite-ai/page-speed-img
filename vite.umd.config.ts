@@ -14,9 +14,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "OpensiteImg",
+      name: "PageSpeedImg",
       formats: ["umd"],
-      fileName: () => "browser/opensite-img.umd.js",
+      fileName: () => "browser/page-speed-img.umd.js",
     },
     rollupOptions: {
       external: ["react", "react-dom"],

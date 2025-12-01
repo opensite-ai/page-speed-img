@@ -1,3 +1,11 @@
+export type ImageFormat = 'avif' | 'webp' | 'jpeg' | 'png';
+
+export type OptixFlowConfig = {
+  apiKey: string;
+  compressionLevel?: number;
+  renderedFileType?: ImageFormat;
+};
+
 export type ProgressiveSizes = Partial<Record<'sm' | 'md' | 'lg' | 'full', string>>;
 
 export type ImageVariantsMap = Partial<

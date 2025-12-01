@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 // Import from source to ensure TS/ESM paths and syntax are valid
-import { Img } from '../src/index.ts';
+import { Img, setDefaultOptixFlowConfig } from '../src/index.ts';
 import {
   imageVariantsHaveRenderableSource,
   imageDataHasRenderableSource,
@@ -14,7 +14,8 @@ describe('package smoke tests', () => {
   it('exports Img component', () => {
     expect(Img).toBeTruthy();
     // displayName is set explicitly for consumers
-    expect((Img as any).displayName).toBe('OpenSiteImg');
+    expect((Img as any).displayName).toBe('PageSpeedImg');
+    expect(typeof setDefaultOptixFlowConfig).toBe('function');
   });
 
   it('utils: imageVariantsHaveRenderableSource behaves on simple inputs', () => {
