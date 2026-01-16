@@ -134,8 +134,6 @@ src/
 ├── feature/
 │   ├── index.ts          # Re-exports
 │   ├── hook.ts           # Implementation
-│   └── types.ts          # Types & interfaces
-├── utils/
 │   └── performance.ts    # Shared utilities
 └── index.ts              # Main entry point
 ```

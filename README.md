@@ -6,7 +6,7 @@
   
 **Performance-optimized React Image component**
 
-Drop-in Image implementation of [web.dev](https://web.dev) best practices with zero configuration.
+Drop-in Image implementation of [web.dev](https://web.dev) best practices with zero configuration. Also a great alternative to [next/image](https://nextjs.org/docs/api-reference/next/image) for non-Next.js projects that still need the automated image optimization tools that the Next `Image` component provides.
 
 [![npm version](https://img.shields.io/npm/v/@page-speed/img?style=flat-square)](https://www.npmjs.com/package/@page-speed/hooks)
 [![npm downloads](https://img.shields.io/npm/dm/@page-speed/img?style=flat-square)](https://www.npmjs.com/package/@page-speed/hooks)
@@ -20,7 +20,7 @@ Drop-in Image implementation of [web.dev](https://web.dev) best practices with z
 
 ## Documentation
 
-`@page-speed/img` is a React-first, OptixFlow-enabled image component that ships Lighthouse-friendly markup by default. It uses `useOptimizedImage` from `@page-speed/hooks` to compute pixel-perfect `src`, DPR-aware `srcset`, and `sizes` on the client without any CDN variant fetches. Tree shaking keeps the bundle lean—only the media hook is pulled in.
+`@page-speed/img` is a React-first, OptixFlow-enabled image component that ships Lighthouse-friendly markup by default. It uses `useOptimizedImage` from `@page-speed/hooks` to compute pixel-perfect `src`, DPR-aware `srcset`, and `sizes` on the client. Tree shaking keeps the bundle lean—only the media hook is pulled in.
 
 ### Installation
 
@@ -46,7 +46,7 @@ export function HeroImage() {
       width={1280}
       height={720}
       // Per-image override (optional)
-      optixFlowConfig={{ renderedFileType: "jpeg" }}
+      optixFlowConfig={{ renderedFileType: "jpeg", objectFit: "cover" }}
     />
   );
 }
@@ -66,7 +66,7 @@ What you get:
 - `loading`, `decoding`: Defaults `lazy` / `async`. Set `eager` to force above-the-fold fetch.
 - `sizes`: Override the auto-generated `sizes` from `useOptimizedImage`.
 - `intersectionMargin`, `intersectionThreshold`: Tweak lazy-load observer.
-- `optixFlowConfig`: `{ apiKey: string; compressionLevel?: number; renderedFileType?: 'avif' | 'webp' | 'jpeg' | 'png'; }`.
+- `optixFlowConfig`: `{ apiKey: string; compressionLevel?: number; renderedFileType?: 'avif' | 'webp' | 'jpeg' | 'png'; objectFit?: 'cover' | 'contain' | 'fill'; }`.
 
 ### Global defaults (React & UMD)
 
@@ -78,7 +78,8 @@ What you get:
   window.PageSpeedImgDefaults = {
     optixFlowConfig: {
       apiKey: "YOUR_OPTIX_KEY",
-      compressionLevel: 80
+      compressionLevel: 80,
+      objectFit: "cover"
     }
   };
 </script>
@@ -125,7 +126,6 @@ pnpm test
 
 ### Roadmap
 
-- Remove legacy `mediaId` shim once internal consumers migrate to the new `src` + OptixFlow path.
 - Add storybook examples for common layouts (hero, gallery, card).
 
 ---

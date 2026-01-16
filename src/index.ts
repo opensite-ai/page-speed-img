@@ -17,5 +17,13 @@ if (globalObject) {
   }
 }
 
+import type { UseOptimizedImageOptions } from '@page-speed/hooks/media';
+
 export * from './core/index.js';
-export * from './types.js';
+export type {
+  ImageFormat,
+  SrcsetByFormat,
+  UseOptimizedImageOptions,
+  UseOptimizedImageState,
+} from '@page-speed/hooks/media';
+export type OptixFlowConfig = UseOptimizedImageOptions['optixFlowConfig'];

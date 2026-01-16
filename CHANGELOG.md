@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.5] - 2026-01-15
+
+### Added
+
+- OptixFlow `objectFit` support (`fit` query param) via `optixFlowConfig.objectFit`.
+
+### Changed
+
+- `Img` now imports `useOptimizedImage` and types from `@page-speed/hooks/media` for better tree-shaking.
+- `@page-speed/img` re-exports hook types from `@page-speed/hooks` instead of duplicating local types.
+
+### Performance
+
+- Avoided redundant media selection event listeners across multiple `<Img />` instances.
+- Removed unused legacy helpers to reduce build output.
+- Added temporary request logging for image URLs to help diagnose repeated transform calls.
+
 ## [0.1.4] - 2025-12-01
 
 ### Added

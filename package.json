@@ -1,6 +1,6 @@
 {
   "name": "@page-speed/img",
-  "version": "0.4.3",
+  "version": "0.4.5",
   "description": "Performance-optimized React Image component. Drop-in image implementation of web.dev best practices with zero configuration.",
   "keywords": [
     "react",
@@ -75,22 +75,23 @@
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@types/node": "^20.17.6",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^8.46.0",
     "@typescript-eslint/parser": "^8.46.0",
+    "@vitejs/plugin-react": "^4.2.1",
     "eslint": "^9.37.0",
     "happy-dom": "^15.11.7",
     "husky": "^9.1.7",
+    "terser": "^5.44.0",
     "typescript": "^5.6.2",
     "vite": "^5.4.20",
-    "@vitejs/plugin-react": "^4.2.1",
-    "terser": "^5.44.0",
-    "vitest": "^3.2.4",
-    "@types/node": "^20.17.6"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@page-speed/hooks": "0.4.3"
+    "@opensite/hooks": "2.0.3",
+    "@page-speed/hooks": "0.4.5"
   },
   "packageManager": "pnpm@10.24.0",
   "engines": {
