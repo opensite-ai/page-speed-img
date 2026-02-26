@@ -1,8 +1,9 @@
 "use client";
 
-import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef } from "react";
+import React, { forwardRef, memo, useCallback, useMemo, useRef } from "react";
 import { useOptimizedImage } from "@page-speed/hooks/media";
 import type { UseOptimizedImageOptions } from "@page-speed/hooks/media";
+import { useImgDebugLog } from "./useImgDebugLog.js";
 import { useMediaSelectionEffect } from "./useMediaSelectionEffect.js";
 import { useResponsiveReset } from "./useResponsiveReset.js";
 
@@ -24,6 +25,8 @@ export type ImgProps = NativeImgProps & {
   intersectionMargin?: string;
   /** OptixFlow integration options */
   optixFlowConfig?: UseOptimizedImageOptions["optixFlowConfig"];
+  /** Enable debug logging for image requests */
+  useDebugMode?: boolean;
 };
 
 type ForwardedImgProps = ImgProps & {
@@ -60,9 +63,6 @@ export const setDefaultOptixFlowConfig = (
 ) => {
   defaultOptixFlowConfig = config ?? undefined;
 };
-
-const isUrlString = (value: unknown): value is string =>
-  typeof value === "string" && value.trim().length > 0;
 
 const parseDimension = (value: unknown): number | undefined => {
   if (value === "" || value === null || typeof value === "undefined")
@@ -102,15 +102,18 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
   title,
   src: directSrc,
   eager,
+  width,
+  height,
+  fetchPriority,
   intersectionMargin,
   intersectionThreshold,
   optixFlowConfig,
+  useDebugMode,
   forwardedRef,
-  ...rest
+  ...restProps
 }) => {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const pictureRef = useRef<HTMLPictureElement | null>(null);
-  const logKeyRef = useRef<string | null>(null);
 
   useResponsiveReset(pictureRef);
   useMediaSelectionEffect();
@@ -119,19 +122,36 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
     () => (typeof directSrc === "string" ? directSrc.trim() : ""),
     [directSrc],
   );
-  const numericWidth = useMemo(
-    () => parseDimension((rest as any).width),
-    [rest],
-  );
-  const numericHeight = useMemo(
-    () => parseDimension((rest as any).height),
-    [rest],
-  );
+  const numericWidth = useMemo(() => parseDimension(width), [width]);
+  const numericHeight = useMemo(() => parseDimension(height), [height]);
   const resolvedOptixConfig = useMemo(
     () => resolveOptixFlowConfig(optixFlowConfig),
     [optixFlowConfig],
   );
-  const eagerLoad = eager ?? loading === "eager";
+  const eagerLoad = useMemo(() => {
+    return eager ?? loading === "eager";
+  }, [eager, loading]);
+
+  const hookOptions = useMemo(
+    () => ({
+      src: normalizedSrc,
+      eager: eagerLoad,
+      width: numericWidth,
+      height: numericHeight,
+      rootMargin: intersectionMargin ?? "200px",
+      threshold: intersectionThreshold ?? 0.1,
+      optixFlowConfig: resolvedOptixConfig,
+    }),
+    [
+      normalizedSrc,
+      eagerLoad,
+      numericWidth,
+      numericHeight,
+      intersectionMargin,
+      intersectionThreshold,
+      resolvedOptixConfig,
+    ],
+  );
 
   const {
     ref: hookRef,
@@ -141,64 +161,49 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
     loading: hookLoading,
     isInView,
     size,
-  } = useOptimizedImage({
-    src: normalizedSrc,
-    eager: eagerLoad,
-    width: numericWidth,
-    height: numericHeight,
-    rootMargin: intersectionMargin ?? "200px",
-    threshold: intersectionThreshold ?? 0.1,
-    optixFlowConfig: resolvedOptixConfig,
-  });
+  } = useOptimizedImage(hookOptions);
 
   const mergedRef = composeRefs(hookRef, forwardedRef, imgRef);
-  const { width, height, ...restProps } = rest as Record<string, unknown>;
-  const sizesAttr = sizes ?? (computedSizes || undefined);
-  const loadingAttr = loading ?? hookLoading ?? "lazy";
-  const decodingAttr = decoding ?? "async";
-  const hasSrcSet = Boolean(srcset.avif || srcset.webp || srcset.jpeg);
-  const imgSrc = src || normalizedSrc || TRANSPARENT_PIXEL;
-  const inlineSrcSet =
-    hasSrcSet && !srcset.avif && !srcset.webp ? srcset.jpeg : "";
-  const parsedWidth = parseDimension(width);
-  const parsedHeight = parseDimension(height);
-  const widthAttr = parsedWidth ?? (size.width || numericWidth || undefined);
-  const heightAttr =
-    parsedHeight ?? (size.height || numericHeight || undefined);
 
-  // Temporary logging to detect repeated transform requests and URL churn.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!eagerLoad && !isInView) return;
-    if (!imgSrc || imgSrc === TRANSPARENT_PIXEL) return;
+  const sizesAttr = useMemo(() => {
+    return sizes ?? (computedSizes || undefined);
+  }, [sizes, computedSizes]);
+  const loadingAttr = useMemo(() => {
+    return loading ?? hookLoading ?? "lazy";
+  }, [loading, hookLoading]);
+  const decodingAttr = useMemo(() => {
+    return decoding ?? "async";
+  }, [decoding]);
+  const fetchPriorityAttr = useMemo(() => {
+    return fetchPriority ?? (eagerLoad ? "high" : undefined);
+  }, [fetchPriority, eagerLoad]);
 
-    const logKey = [
-      imgSrc,
-      srcset.avif,
-      srcset.webp,
-      srcset.jpeg,
-      sizesAttr ?? "",
-    ].join("|");
+  const hasSrcSet = useMemo(() => {
+    return Boolean(srcset.avif || srcset.webp || srcset.jpeg);
+  }, [srcset.avif, srcset.webp, srcset.jpeg]);
+  const imgSrc = useMemo(() => {
+    return src || normalizedSrc || TRANSPARENT_PIXEL;
+  }, [src, normalizedSrc]);
+  const inlineSrcSet = useMemo(() => {
+    return hasSrcSet && !srcset.avif && !srcset.webp ? srcset.jpeg : "";
+  }, [hasSrcSet, srcset.avif, srcset.webp, srcset.jpeg]);
 
-    if (logKeyRef.current === logKey) return;
-    logKeyRef.current = logKey;
+  const widthAttr = useMemo(() => {
+    return numericWidth ?? (size.width || undefined);
+  }, [numericWidth, size?.width]);
+  const heightAttr = useMemo(() => {
+    return numericHeight ?? (size.height || undefined);
+  }, [numericHeight, size?.height]);
 
-    if (typeof console !== "undefined" && console.info) {
-      console.info("[PageSpeedImg] image request", {
-        src: imgSrc,
-        srcset,
-        sizes: sizesAttr,
-      });
-    }
-  }, [
+  useImgDebugLog({
+    enabled: useDebugMode ?? false,
     eagerLoad,
-    imgSrc,
     isInView,
+    imgSrc,
+    transparentPixel: TRANSPARENT_PIXEL,
+    srcset,
     sizesAttr,
-    srcset.avif,
-    srcset.webp,
-    srcset.jpeg,
-  ]);
+  });
 
   if (!hasSrcSet) {
     return (
@@ -207,6 +212,7 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
         src={imgSrc}
         loading={loadingAttr}
         decoding={decodingAttr}
+        fetchPriority={fetchPriorityAttr}
         alt={alt}
         title={title}
         width={widthAttr}
@@ -231,6 +237,7 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
         sizes={inlineSrcSet ? sizesAttr : undefined}
         loading={loadingAttr}
         decoding={decodingAttr}
+        fetchPriority={fetchPriorityAttr}
         alt={alt}
         title={title}
         width={widthAttr}

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@opensite/hooks':
-        specifier: 2.0.3
-        version: 2.0.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        specifier: 2.0.8
+        version: 2.0.8(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@page-speed/hooks':
         specifier: 0.4.5
         version: 0.4.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -432,8 +432,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@opensite/hooks@2.0.3':
-    resolution: {integrity: sha512-9QYpJwHyGmCjJ9zO43n1Aq+5dx9hmZyPgdAQWFlxVWdg43sa2R82JIAfWJ5YEPYVUosnQS1oezMN/ZEe9wJU1w==}
+  '@opensite/hooks@2.0.8':
+    resolution: {integrity: sha512-cdklMZq+CYdBSNtAhcjs/y15xViKeAvAEs7UPUWHz9saPR5PeNGjOQtA2VFoctzTp/30/e95R3U1WzsfTuBulQ==}
     engines: {node: '>=18.0.0', pnpm: '>=9.0.0'}
     peerDependencies:
       react: '>=17.0.0'
@@ -1928,7 +1928,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@opensite/hooks@2.0.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@opensite/hooks@2.0.8(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)

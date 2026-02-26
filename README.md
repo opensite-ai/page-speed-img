@@ -1,10 +1,8 @@
+# ⚡ @page-speed/img
+
 ![Page Speed React Image Component](https://octane.cdn.ing/api/v1/images/transform?url=https://toastability-production.s3.amazonaws.com/gghtx0lxw9f2zigs427qc2phu024&q=85&f=avif)
 
----
-
-# ⚡ @page-speed/img
-  
-**Performance-optimized React Image component**
+> **Performance-optimized React Image component**
 
 Drop-in Image implementation of [web.dev](https://web.dev) best practices with zero configuration. Also a great alternative to [next/image](https://nextjs.org/docs/api-reference/next/image) for non-Next.js projects that still need the automated image optimization tools that the Next `Image` component provides.
 
