@@ -129,3 +129,7 @@ pnpm test
 ## Contributing
 
 PRs welcome. Please run `pnpm test` before submitting.
+
+## License
+
+BSD 3-Clause

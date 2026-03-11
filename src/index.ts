@@ -27,3 +27,6 @@ export type {
   UseOptimizedImageState,
 } from '@page-speed/hooks/media';
 export type OptixFlowConfig = UseOptimizedImageOptions['optixFlowConfig'];
+// Re-export specific items for clarity and CDN usage
+export { Img, setDefaultOptixFlowConfig, OptixFlowConfig } from './core/index.js';
+export type { ImgProps, OptixFlowConfigProps } from './core/index.js';

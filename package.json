@@ -1,6 +1,6 @@
 {
   "name": "@page-speed/img",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Performance-optimized React Image component. Drop-in image implementation of web.dev best practices with zero configuration.",
   "keywords": [
     "react",
@@ -66,7 +66,7 @@
     "bundle-analysis": "node scripts/analyze-bundle.js || true",
     "prepare": "husky",
     "prepack": "pnpm run build",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build && pnpm run test"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
@@ -75,6 +75,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^20.17.6",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -90,7 +91,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@opensite/hooks": "2.0.8",
+    "@opensite/hooks": "2.1.0",
     "@page-speed/hooks": "0.4.5"
   },
   "packageManager": "pnpm@10.24.0",

@@ -4,7 +4,7 @@ import { act } from "react-dom/test-utils";
 import { createRoot } from "react-dom/client";
 
 // Import from source to ensure TS/ESM paths and syntax are valid
-import { Img, setDefaultOptixFlowConfig } from "../src/index.ts";
+import { Img, setDefaultOptixFlowConfig, OptixFlowConfig } from "../src/index.ts";
 import { sendMediaSelection } from "../src/core/useMediaSelectionEffect.ts";
 import { resetResponsivePictureState } from "../src/core/useResponsiveReset.ts";
 
@@ -26,6 +26,13 @@ describe("package smoke tests", () => {
     // displayName is set explicitly for consumers
     expect((Img as any).displayName).toBe("PageSpeedImg");
     expect(typeof setDefaultOptixFlowConfig).toBe("function");
+  });
+
+  it("exports OptixFlowConfig component", () => {
+    expect(OptixFlowConfig).toBeTruthy();
+    expect(typeof OptixFlowConfig).toBe("function");
+    // Should be a valid React component function
+    expect(OptixFlowConfig.name).toBe("OptixFlowConfig");
   });
 
   it("dispatches media selection events with payload", () => {
