@@ -1,8 +1,8 @@
-# OptixFlowConfig Component
+# ImgDefaults Component
 
-The `OptixFlowConfig` component provides an SSR-safe way to set default OptixFlow configuration for all `Img` components in your application.
+The `ImgDefaults` component provides an SSR-safe way to set default OptixFlow configuration for all `Img` components in your application.
 
-## Why Use OptixFlowConfig?
+## Why Use ImgDefaults?
 
 Previously, setting default OptixFlow configuration required calling `setDefaultOptixFlowConfig()` directly, which could cause SSR errors:
 
@@ -11,7 +11,7 @@ Previously, setting default OptixFlow configuration required calling `setDefault
 setDefaultOptixFlowConfig({ apiKey: 'your-key' });
 ```
 
-The `OptixFlowConfig` component solves this by:
+The `ImgDefaults` component solves this by:
 - Using React's `useEffect` to ensure configuration is only set on the client
 - Providing a declarative, component-based approach
 - Avoiding hydration mismatches in SSR environments
@@ -23,12 +23,12 @@ The `OptixFlowConfig` component solves this by:
 Place the component at your app's root level:
 
 ```tsx
-import { OptixFlowConfig } from '@page-speed/img';
+import { ImgDefaults } from '@page-speed/img';
 
 function App() {
   return (
     <>
-      <OptixFlowConfig config={{
+      <ImgDefaults config={{
         apiKey: 'your-optixflow-api-key',
         compressionLevel: 80
       }} />
@@ -45,17 +45,17 @@ function App() {
 You can also use it to wrap your app:
 
 ```tsx
-import { OptixFlowConfig } from '@page-speed/img';
+import { ImgDefaults } from '@page-speed/img';
 
 function App() {
   return (
-    <OptixFlowConfig config={{
+    <ImgDefaults config={{
       apiKey: 'your-optixflow-api-key',
       compressionLevel: 80
     }}>
       {/* All Img components inside will use these defaults */}
       <YourApp />
-    </OptixFlowConfig>
+    </ImgDefaults>
   );
 }
 ```
@@ -66,17 +66,17 @@ For Next.js apps, add it to your `_app.tsx`:
 
 ```tsx
 // pages/_app.tsx
-import { OptixFlowConfig } from '@page-speed/img';
+import { ImgDefaults } from '@page-speed/img';
 import type { AppProps } from 'next/app';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <OptixFlowConfig config={{
+    <ImgDefaults config={{
       apiKey: process.env.NEXT_PUBLIC_OPTIXFLOW_API_KEY,
       compressionLevel: 75
     }}>
       <Component {...pageProps} />
-    </OptixFlowConfig>
+    </ImgDefaults>
   );
 }
 ```
@@ -100,19 +100,19 @@ For Rails applications using CDN imports (like customer-sites):
 <% end %>
 ```
 
-### Option 2: Use OptixFlowConfig Component (SSR-Safe)
+### Option 2: Use ImgDefaults Component (SSR-Safe)
 
 ```erb
 <div id="root"></div>
 
 <script type="module">
-  import { OptixFlowConfig, Img } from 'https://cdn.example.com/page-speed-img/index.js';
+  import { ImgDefaults, Img } from 'https://cdn.example.com/page-speed-img/index.js';
   import React from 'https://cdn.example.com/react/index.js';
   import ReactDOM from 'https://cdn.example.com/react-dom/index.js';
 
   const App = () => {
     return React.createElement(
-      OptixFlowConfig,
+      ImgDefaults,
       {
         config: {
           apiKey: '<%= j optix_flow_api_key %>',
@@ -144,7 +144,7 @@ interface OptixFlowConfig {
 Individual `Img` components can still override the default configuration:
 
 ```tsx
-// This uses the default config set by OptixFlowConfig
+// This uses the default config set by ImgDefaults
 <Img src="default.jpg" alt="Uses defaults" />
 
 // This overrides with custom config
@@ -163,13 +163,13 @@ The component is fully SSR-compatible:
 
 ```tsx
 // pages/index.tsx (Next.js SSR/SSG)
-import { OptixFlowConfig, Img } from '@page-speed/img';
+import { ImgDefaults, Img } from '@page-speed/img';
 
 export default function Page() {
   return (
     <>
       {/* Safe to use in SSR - configuration only applied on client */}
-      <OptixFlowConfig config={{ apiKey: 'your-key' }} />
+      <ImgDefaults config={{ apiKey: 'your-key' }} />
 
       {/* Images will use the config once hydrated */}
       <Img src="photo.jpg" alt="Photo" />
@@ -185,17 +185,17 @@ export async function getServerSideProps() {
 
 ## Testing
 
-When testing components that use OptixFlowConfig:
+When testing components that use ImgDefaults:
 
 ```tsx
 import { render } from '@testing-library/react';
-import { OptixFlowConfig, Img } from '@page-speed/img';
+import { ImgDefaults, Img } from '@page-speed/img';
 
 test('renders with OptixFlow config', () => {
   const { getByAltText } = render(
-    <OptixFlowConfig config={{ apiKey: 'test-key' }}>
+    <ImgDefaults config={{ apiKey: 'test-key' }}>
       <Img src="test.jpg" alt="Test image" />
-    </OptixFlowConfig>
+    </ImgDefaults>
   );
 
   expect(getByAltText('Test image')).toBeInTheDocument();
@@ -216,26 +216,26 @@ function App() {
 }
 
 // After (SSR-safe)
-import { OptixFlowConfig } from '@page-speed/img';
+import { ImgDefaults } from '@page-speed/img';
 
 function App() {
   return (
-    <OptixFlowConfig config={{ apiKey: 'your-key' }}>
+    <ImgDefaults config={{ apiKey: 'your-key' }}>
       <YourApp />
-    </OptixFlowConfig>
+    </ImgDefaults>
   );
 }
 ```
 
 ## Best Practices
 
-1. **Place at root level**: Add OptixFlowConfig at the highest level of your app to ensure all Img components can access the configuration.
+1. **Place at root level**: Add ImgDefaults at the highest level of your app to ensure all Img components can access the configuration.
 
-2. **Set once**: Only include one OptixFlowConfig component in your app. Multiple instances will override each other.
+2. **Set once**: Only include one ImgDefaults component in your app. Multiple instances will override each other.
 
 3. **Environment variables**: Use environment variables for API keys:
    ```tsx
-   <OptixFlowConfig config={{
+   <ImgDefaults config={{
      apiKey: process.env.REACT_APP_OPTIXFLOW_KEY
    }} />
    ```
@@ -248,12 +248,12 @@ function App() {
 
 ### Config not being applied
 
-Ensure OptixFlowConfig is rendered before any Img components that need the configuration.
+Ensure ImgDefaults is rendered before any Img components that need the configuration.
 
 ### SSR hydration warnings
 
-If you see hydration warnings, make sure you're not calling `setDefaultOptixFlowConfig` directly. Use the OptixFlowConfig component instead.
+If you see hydration warnings, make sure you're not calling `setDefaultOptixFlowConfig` directly. Use the ImgDefaults component instead.
 
 ### Multiple configurations
 
-If you need different configurations for different parts of your app, use the `optixFlowConfig` prop on individual Img components rather than trying to nest multiple OptixFlowConfig components.
+If you need different configurations for different parts of your app, use the `optixFlowConfig` prop on individual Img components rather than trying to nest multiple ImgDefaults components.

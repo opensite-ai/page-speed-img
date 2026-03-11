@@ -4,7 +4,7 @@ import { act } from "react-dom/test-utils";
 import { createRoot } from "react-dom/client";
 
 // Import from source to ensure TS/ESM paths and syntax are valid
-import { Img, setDefaultOptixFlowConfig, OptixFlowConfig } from "../src/index.ts";
+import { Img, setDefaultOptixFlowConfig, ImgDefaults } from "../src/index.ts";
 import { sendMediaSelection } from "../src/core/useMediaSelectionEffect.ts";
 import { resetResponsivePictureState } from "../src/core/useResponsiveReset.ts";
 
@@ -28,11 +28,11 @@ describe("package smoke tests", () => {
     expect(typeof setDefaultOptixFlowConfig).toBe("function");
   });
 
-  it("exports OptixFlowConfig component", () => {
-    expect(OptixFlowConfig).toBeTruthy();
-    expect(typeof OptixFlowConfig).toBe("function");
+  it("exports ImgDefaults component", () => {
+    expect(ImgDefaults).toBeTruthy();
+    expect(typeof ImgDefaults).toBe("function");
     // Should be a valid React component function
-    expect(OptixFlowConfig.name).toBe("OptixFlowConfig");
+    expect(ImgDefaults.name).toBe("ImgDefaults");
   });
 
   it("dispatches media selection events with payload", () => {
@@ -43,7 +43,10 @@ describe("package smoke tests", () => {
 
     expect(listener).toHaveBeenCalledTimes(1);
     const event = listener.mock.calls[0][0] as CustomEvent;
-    expect(event.detail).toEqual({ blockId: "block-123", payload: { mediaId: 42 } });
+    expect(event.detail).toEqual({
+      blockId: "block-123",
+      payload: { mediaId: 42 },
+    });
 
     window.removeEventListener("dt:media-selected", listener);
   });

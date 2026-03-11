@@ -2,31 +2,35 @@
 type GlobalWithProcess = typeof globalThis & { process?: NodeJS.Process };
 
 const globalObject =
-  typeof globalThis !== 'undefined' ? (globalThis as GlobalWithProcess) : undefined;
+  typeof globalThis !== "undefined"
+    ? (globalThis as GlobalWithProcess)
+    : undefined;
 
 if (globalObject) {
   if (!globalObject.process) {
     globalObject.process = {
-      env: { NODE_ENV: 'production' } as NodeJS.ProcessEnv,
+      env: { NODE_ENV: "production" } as NodeJS.ProcessEnv,
     } as NodeJS.Process;
   } else {
-    const env = globalObject.process.env ?? (globalObject.process.env = {} as NodeJS.ProcessEnv);
-    if (typeof env.NODE_ENV === 'undefined') {
-      env.NODE_ENV = 'production';
+    const env =
+      globalObject.process.env ??
+      (globalObject.process.env = {} as NodeJS.ProcessEnv);
+    if (typeof env.NODE_ENV === "undefined") {
+      env.NODE_ENV = "production";
     }
   }
 }
 
-import type { UseOptimizedImageOptions } from '@page-speed/hooks/media';
+import type { UseOptimizedImageOptions } from "@page-speed/hooks/media";
 
-export * from './core/index.js';
+export * from "./core/index.js";
 export type {
   ImageFormat,
   SrcsetByFormat,
   UseOptimizedImageOptions,
   UseOptimizedImageState,
-} from '@page-speed/hooks/media';
-export type OptixFlowConfig = UseOptimizedImageOptions['optixFlowConfig'];
+} from "@page-speed/hooks/media";
+export type OptixFlowConfig = UseOptimizedImageOptions["optixFlowConfig"];
 // Re-export specific items for clarity and CDN usage
-export { Img, setDefaultOptixFlowConfig, OptixFlowConfig } from './core/index.js';
-export type { ImgProps, OptixFlowConfigProps } from './core/index.js';
+export { Img, setDefaultOptixFlowConfig, ImgDefaults } from "./core/index.js";
+export type { ImgProps, ImgDefaultsProps } from "./core/index.js";

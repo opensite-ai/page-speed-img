@@ -32,14 +32,14 @@ page-speed-img/
 │   ├── core/
 │   │   ├── index.ts              # Re-exports from core sub-modules
 │   │   ├── Img.tsx               # <Img /> component + setDefaultOptixFlowConfig()
-│   │   ├── OptixFlowConfig.tsx   # <OptixFlowConfig /> component (SSR-safe config provider)
+│   │   ├── ImgDefaults.tsx   # <ImgDefaults /> component (SSR-safe config provider)
 │   │   ├── useImgDebugLog.ts     # Debug logging hook (dev-only, tree-shaken in prod)
 │   │   ├── useMediaSelectionEffect.ts  # Dispatches dt:media-selected DOM events
 │   │   └── useResponsiveReset.ts       # Forces <picture> srcset re-evaluation on resize
 │   └── utils/                    # Internal utilities (not part of public API)
 ├── tests/
 │   ├── smoke.test.tsx            # Broad smoke tests: exports, DOM rendering, events
-│   └── OptixFlowConfig.test.tsx  # Unit tests for <OptixFlowConfig />
+│   └── ImgDefaults.test.tsx  # Unit tests for <ImgDefaults />
 ├── scripts/
 │   ├── emit-cjs.js               # Post-tsc step: rewrites .js → .cjs + barrel files
 │   └── analyze-bundle.js         # Bundle size analysis (runs with || true, non-blocking)
@@ -76,36 +76,38 @@ import { Img } from "@page-speed/img";
   alt="A photo"
   width={800}
   height={600}
-  eager                              // force above-the-fold loading (optional)
+  eager // force above-the-fold loading (optional)
   optixFlowConfig={{ apiKey: "..." }} // OptixFlow config override (optional)
-/>
+/>;
 ```
 
 **Key behavior:**
+
 - Renders `<picture>` with AVIF + WebP `<source>` elements when OptixFlow is active.
 - Renders a plain `<img>` when OptixFlow is disabled or no srcset is generated.
 - Returns `null` and emits a `console.warn` if `src` is falsy/empty.
 - `loading` defaults to `"lazy"`; `decoding` defaults to `"async"`.
 - `fetchPriority` is set to `"high"` automatically when `eager` is true.
 
-#### `<OptixFlowConfig />` *(preferred approach for setting global defaults)*
+#### `<ImgDefaults />` _(preferred approach for setting global defaults)_
 
 An SSR-safe declarative component that sets the default OptixFlow config for all `<Img />`
 instances in the tree. Place it once at the root of the application.
 
 ```tsx
-import { OptixFlowConfig } from "@page-speed/img";
+import { ImgDefaults } from "@page-speed/img";
 
 // Standalone (no children):
-<OptixFlowConfig config={{ apiKey: process.env.NEXT_PUBLIC_OPTIX_API_KEY, compressionLevel: 80 }} />
+<ImgDefaults config={{ apiKey: process.env.NEXT_PUBLIC_OPTIX_API_KEY, compressionLevel: 80 }} />
 
 // As a wrapper:
-<OptixFlowConfig config={{ apiKey: "...", compressionLevel: 80 }}>
+<ImgDefaults config={{ apiKey: "...", compressionLevel: 80 }}>
   <App />
-</OptixFlowConfig>
+</ImgDefaults>
 ```
 
 **Why prefer this over `setDefaultOptixFlowConfig()`:**
+
 - Config is applied inside `useEffect`, so it never runs during SSR.
 - Config re-applies automatically when the `config` prop changes (supports hot reload).
 - Idiomatic React — works with React 18/19 concurrent rendering.
@@ -131,13 +133,14 @@ setDefaultOptixFlowConfig(null);
 ```
 
 **Use cases for the function approach:**
+
 - Non-React initialization code (Vanilla JS, script tags).
 - Test setup / teardown.
-- UMD builds where `<OptixFlowConfig />` cannot be rendered before the rest of the app.
+- UMD builds where `<ImgDefaults />` cannot be rendered before the rest of the app.
 
 > ⚠️ **SSR caveat:** Calling this function during SSR (e.g., in a Next.js Server Component or
 > `getServerSideProps`) will set the config on the module-level singleton, which is shared
-> across requests in a Node.js process. Use `<OptixFlowConfig />` or only call this function
+> across requests in a Node.js process. Use `<ImgDefaults />` or only call this function
 > inside `useEffect` / client-only code paths.
 
 ### Browser globals (UMD only)
@@ -147,13 +150,14 @@ When using the UMD bundle from a CDN, the config can be set before the script lo
 ```html
 <script>
   window.PageSpeedImgDefaults = {
-    optixFlowConfig: { apiKey: "YOUR_KEY", compressionLevel: 80 }
+    optixFlowConfig: { apiKey: "YOUR_KEY", compressionLevel: 80 },
   };
 </script>
 <script src="https://cdn.../page-speed-img.umd.js"></script>
 ```
 
 All three globals are honored (checked in order, first wins):
+
 1. `window.PageSpeedImgDefaults.optixFlowConfig`
 2. `window.OpensiteImgDefaults.optixFlowConfig`
 3. `window.PAGE_SPEED_IMG_DEFAULTS.optixFlowConfig`
@@ -161,7 +165,7 @@ All three globals are honored (checked in order, first wins):
 ### Types
 
 ```ts
-import type { ImgProps, OptixFlowConfigProps } from "@page-speed/img";
+import type { ImgProps, ImgDefaultsProps } from "@page-speed/img";
 
 // Hook types re-exported from @page-speed/hooks for convenience:
 import type {
@@ -177,20 +181,20 @@ import type { OptixFlowConfig } from "@page-speed/img"; // = UseOptimizedImageOp
 
 ### `ImgProps` reference
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `src` | `string` | — | **Required.** Image URL. |
-| `alt` | `string` | — | Alt text (passed to `<img>`). |
-| `width` | `number \| string` | — | Layout hint; prevents CLS. |
-| `height` | `number \| string` | — | Layout hint; prevents CLS. |
-| `eager` | `boolean` | `false` | Force eager loading + `fetchPriority="high"`. |
-| `loading` | `"lazy" \| "eager"` | `"lazy"` | Native loading attribute. |
-| `decoding` | `"async" \| "sync" \| "auto"` | `"async"` | Native decoding attribute. |
-| `sizes` | `string` | auto | Override computed `sizes`. |
-| `intersectionMargin` | `string` | `"200px"` | `rootMargin` for IntersectionObserver. |
-| `intersectionThreshold` | `number` | `0.1` | `threshold` for IntersectionObserver. |
-| `optixFlowConfig` | `OptixFlowConfig` | `undefined` | Per-image OptixFlow override. |
-| `useDebugMode` | `boolean` | `false` | Log image state to console. |
+| Prop                    | Type                          | Default     | Description                                   |
+| ----------------------- | ----------------------------- | ----------- | --------------------------------------------- |
+| `src`                   | `string`                      | —           | **Required.** Image URL.                      |
+| `alt`                   | `string`                      | —           | Alt text (passed to `<img>`).                 |
+| `width`                 | `number \| string`            | —           | Layout hint; prevents CLS.                    |
+| `height`                | `number \| string`            | —           | Layout hint; prevents CLS.                    |
+| `eager`                 | `boolean`                     | `false`     | Force eager loading + `fetchPriority="high"`. |
+| `loading`               | `"lazy" \| "eager"`           | `"lazy"`    | Native loading attribute.                     |
+| `decoding`              | `"async" \| "sync" \| "auto"` | `"async"`   | Native decoding attribute.                    |
+| `sizes`                 | `string`                      | auto        | Override computed `sizes`.                    |
+| `intersectionMargin`    | `string`                      | `"200px"`   | `rootMargin` for IntersectionObserver.        |
+| `intersectionThreshold` | `number`                      | `0.1`       | `threshold` for IntersectionObserver.         |
+| `optixFlowConfig`       | `ImgDefaults`                 | `undefined` | Per-image OptixFlow override.                 |
+| `useDebugMode`          | `boolean`                     | `false`     | Log image state to console.                   |
 
 All standard `HTMLImageElement` attributes are also accepted (spread onto `<img>`), except
 `srcSet` and `sizes` which are managed internally.
@@ -258,10 +262,10 @@ pnpm test --watch  # watch mode for development
 
 ### Test file conventions
 
-| File | What it tests |
-|------|---------------|
-| `tests/smoke.test.tsx` | Package exports exist, DOM rendering via `createRoot`/`act`, custom events, `resetResponsivePictureState` |
-| `tests/OptixFlowConfig.test.tsx` | `<OptixFlowConfig />` component behavior, SSR safety, config propagation, edge cases |
+| File                         | What it tests                                                                                             |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `tests/smoke.test.tsx`       | Package exports exist, DOM rendering via `createRoot`/`act`, custom events, `resetResponsivePictureState` |
+| `tests/ImgDefaults.test.tsx` | `<ImgDefaults />` component behavior, SSR safety, config propagation, edge cases                          |
 
 ### Critical rules for writing tests
 
@@ -287,7 +291,7 @@ pnpm test --watch  # watch mode for development
    global state between tests.
 
 4. **`waitFor` is required for `useEffect` assertions** — `setDefaultOptixFlowConfig` is
-   called inside `useEffect` in `<OptixFlowConfig />`, so assertions on it must be wrapped in
+   called inside `useEffect` in `<ImgDefaults />`, so assertions on it must be wrapped in
    `await waitFor(...)`.
 
 5. **Smoke tests use `createRoot` + `act` directly** (not `@testing-library/react`) to avoid
@@ -301,15 +305,17 @@ pnpm test --watch  # watch mode for development
 ### `src/index.ts`
 
 The public entry point. Responsibilities:
+
 - Patches `globalThis.process.env.NODE_ENV` for UMD/browser environments that lack it.
-- Re-exports `Img`, `setDefaultOptixFlowConfig`, `OptixFlowConfig` from `./core/index.js`.
-- Re-exports `ImgProps`, `OptixFlowConfigProps` type aliases.
+- Re-exports `Img`, `setDefaultOptixFlowConfig`, `ImgDefaults` from `./core/index.js`.
+- Re-exports `ImgProps`, `ImgDefaultsProps` type aliases.
 - Re-exports hook types from `@page-speed/hooks/media` for consumer convenience.
 - Exports the `OptixFlowConfig` type alias (`= UseOptimizedImageOptions["optixFlowConfig"]`).
 
 ### `src/core/Img.tsx`
 
 The implementation of `<Img />`. Key internals:
+
 - `defaultOptixFlowConfig` — module-level variable set by `setDefaultOptixFlowConfig()`.
 - `readGlobalOptixFlowConfig()` — reads `window.PageSpeedImgDefaults` etc. for UMD support.
 - `resolveOptixFlowConfig()` — merges prop → module default → window global (in that priority).
@@ -318,9 +324,10 @@ The implementation of `<Img />`. Key internals:
 - `parseDimension()` — safely converts `width`/`height` props (may be strings) to numbers.
 - `Img` — the exported memoized component; returns `null` with a warning if `src` is empty.
 
-### `src/core/OptixFlowConfig.tsx`
+### `src/core/ImgDefaults.tsx`
 
 SSR-safe config provider. Key rules:
+
 - **`useEffect` only** — config is never set during the render phase. This is what makes it
   SSR-safe. Do not add any code outside `useEffect` that calls `setDefaultOptixFlowConfig` or
   accesses `window`.
@@ -383,7 +390,7 @@ These rules apply to all source code in this package:
 
 4. **`globalThis` is safe at module scope** — it exists in both Node.js and browsers.
 
-5. **`"use client"` directives** — `Img.tsx` and `OptixFlowConfig.tsx` both carry `"use client"`.
+5. **`"use client"` directives** — `Img.tsx` and `ImgDefaults.tsx` both carry `"use client"`.
    This is required for Next.js App Router. Do not remove these directives.
 
 ---
@@ -395,7 +402,7 @@ The `optixFlowConfig` prop / default config object type is:
 ```ts
 type OptixFlowConfig = {
   apiKey: string;
-  compressionLevel?: number;       // 1–100, default determined by CDN
+  compressionLevel?: number; // 1–100, default determined by CDN
   renderedFileType?: "avif" | "webp" | "jpeg" | "png";
   objectFit?: "cover" | "contain" | "fill";
 };
@@ -415,7 +422,7 @@ The source of truth lives in that package; do not duplicate or redefine the type
 3. Wire it up in the appropriate `useMemo` or pass it through to `useOptimizedImage`.
 4. Ensure SSR safety (no direct `window` access in render phase).
 5. Document it in the Props table in `README.md`.
-6. Add a test in `tests/smoke.test.tsx` or `tests/OptixFlowConfig.test.tsx`.
+6. Add a test in `tests/smoke.test.tsx` or `tests/ImgDefaults.test.tsx`.
 
 ### Adding a new export
 
@@ -431,7 +438,7 @@ The source of truth lives in that package; do not duplicate or redefine the type
 3. Run `pnpm prepublishOnly` — **both `build` and `test` must pass 100%**.
 4. Publish with `pnpm publish`.
 
-### Changing `OptixFlowConfig`
+### Changing `ImgDefaults`
 
 - Only ever add side effects inside `useEffect`. The render phase must stay pure.
 - The `config` dependency array entry in `useEffect` is intentional — it re-applies when
@@ -442,15 +449,15 @@ The source of truth lives in that package; do not duplicate or redefine the type
 
 ## Gotchas and Anti-Patterns
 
-| Anti-pattern | Why it's wrong | Correct approach |
-|---|---|---|
-| Calling `React.useRef` / any hook inside `if (...) { }` | Violates Rules of Hooks; React tracks hooks by call order | Move the hook call to the top level of the function |
-| `Object.defineProperty(global, 'window', { value: undefined })` in tests | Corrupts `window` for all subsequent tests; React 19 crashes on `window.event` | Never null out `window`; test SSR safety by design, not by environment mutation |
-| `(global as any).setDefaultOptixFlowConfig = vi.fn()` to mock | Sets a global property; does not intercept the module-bound import | Use `vi.spyOn(CoreImg, 'setDefaultOptixFlowConfig')` |
-| Importing with `.ts`/`.tsx` extension in `src/` | Breaks Node ESM resolution at runtime | Use `.js` extension in all `src/` relative imports |
-| Accessing `window` in module scope | Throws during SSR | Guard with `typeof window !== 'undefined'` inside a function, or use `useEffect` |
-| Adding `toBeInTheDocument()` assertions | `@testing-library/jest-dom` is not installed or configured | Use `.toBeTruthy()`, `.not.toBeNull()`, or DOM query comparisons |
-| Duplicating `OptixFlowConfig` type definition | Gets out of sync with `@page-speed/hooks` | Always use `UseOptimizedImageOptions["optixFlowConfig"]` from the hooks package |
+| Anti-pattern                                                             | Why it's wrong                                                                 | Correct approach                                                                 |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Calling `React.useRef` / any hook inside `if (...) { }`                  | Violates Rules of Hooks; React tracks hooks by call order                      | Move the hook call to the top level of the function                              |
+| `Object.defineProperty(global, 'window', { value: undefined })` in tests | Corrupts `window` for all subsequent tests; React 19 crashes on `window.event` | Never null out `window`; test SSR safety by design, not by environment mutation  |
+| `(global as any).setDefaultOptixFlowConfig = vi.fn()` to mock            | Sets a global property; does not intercept the module-bound import             | Use `vi.spyOn(CoreImg, 'setDefaultOptixFlowConfig')`                             |
+| Importing with `.ts`/`.tsx` extension in `src/`                          | Breaks Node ESM resolution at runtime                                          | Use `.js` extension in all `src/` relative imports                               |
+| Accessing `window` in module scope                                       | Throws during SSR                                                              | Guard with `typeof window !== 'undefined'` inside a function, or use `useEffect` |
+| Adding `toBeInTheDocument()` assertions                                  | `@testing-library/jest-dom` is not installed or configured                     | Use `.toBeTruthy()`, `.not.toBeNull()`, or DOM query comparisons                 |
+| Duplicating `OptixFlowConfig` type definition                            | Gets out of sync with `@page-speed/hooks`                                      | Always use `UseOptimizedImageOptions["optixFlowConfig"]` from the hooks package  |
 
 ---
 
@@ -479,7 +486,7 @@ The source of truth lives in that package; do not duplicate or redefine the type
 
 No environment variables are required for the package itself. The `apiKey` is passed by
 consumers at runtime. Consumers in Next.js typically expose it via
-`NEXT_PUBLIC_OPTIX_FLOW_API_KEY` (or similar) and pass it to `<OptixFlowConfig />` or
+`NEXT_PUBLIC_OPTIX_FLOW_API_KEY` (or similar) and pass it to `<ImgDefaults />` or
 `setDefaultOptixFlowConfig()`.
 
 ---
@@ -500,7 +507,7 @@ This package follows [Semantic Versioning](https://semver.org/):
 ```
 src/index.ts                → public entry; edit this when adding/removing exports
 src/core/Img.tsx            → <Img /> component implementation
-src/core/OptixFlowConfig.tsx→ <OptixFlowConfig /> component
+src/core/ImgDefaults.tsx→ <ImgDefaults /> component
 src/core/index.ts           → re-exports from core; must mirror what index.ts re-exports
 pnpm prepublishOnly         → the single gate before every publish (build + test)
 vitest.config.ts            → test environment (happy-dom, no jest-dom matchers)

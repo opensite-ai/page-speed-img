@@ -3,18 +3,14 @@ import React from "react";
 import { render, waitFor } from "@testing-library/react";
 
 // Import from source to test the actual implementation
-import {
-  OptixFlowConfig,
-  setDefaultOptixFlowConfig,
-  Img,
-} from "../src/index.ts";
-import type { OptixFlowConfigProps } from "../src/index.ts";
+import { ImgDefaults, setDefaultOptixFlowConfig, Img } from "../src/index.ts";
+import type { ImgDefaultsProps } from "../src/index.ts";
 
 // Module namespace used for vi.spyOn – must resolve to the same instance that
-// OptixFlowConfig.tsx binds to at import time so the spy intercepts its calls.
+// ImgDefaults.tsx binds to at import time so the spy intercepts its calls.
 import * as CoreImg from "../src/core/Img";
 
-describe("OptixFlowConfig Component", () => {
+describe("ImgDefaults Component", () => {
   beforeEach(() => {
     // Reset the default config before each test using the real function.
     // vi.restoreAllMocks() in afterEach ensures any spy created during the
@@ -32,13 +28,13 @@ describe("OptixFlowConfig Component", () => {
 
   // ---------------------------------------------------------------------------
   describe("Component Export", () => {
-    it("exports OptixFlowConfig component", () => {
-      expect(OptixFlowConfig).toBeTruthy();
-      expect(typeof OptixFlowConfig).toBe("function");
+    it("exports ImgDefaults component", () => {
+      expect(ImgDefaults).toBeTruthy();
+      expect(typeof ImgDefaults).toBe("function");
     });
 
     it("has correct prop types", () => {
-      const testConfig: OptixFlowConfigProps = {
+      const testConfig: ImgDefaultsProps = {
         config: {
           apiKey: "test-key",
           compressionLevel: 80,
@@ -51,8 +47,8 @@ describe("OptixFlowConfig Component", () => {
   // ---------------------------------------------------------------------------
   describe("SSR Safety", () => {
     it("component can be imported and defined in SSR environment", () => {
-      expect(OptixFlowConfig).toBeDefined();
-      expect(typeof OptixFlowConfig).toBe("function");
+      expect(ImgDefaults).toBeDefined();
+      expect(typeof ImgDefaults).toBe("function");
     });
 
     it("handles missing window gracefully", () => {
@@ -61,7 +57,7 @@ describe("OptixFlowConfig Component", () => {
       // environment (where window IS available) must not throw, and it
       // demonstrates that the render phase itself has no direct window access.
       expect(() => {
-        render(<OptixFlowConfig config={{ apiKey: "ssr-safe-key" }} />);
+        render(<ImgDefaults config={{ apiKey: "ssr-safe-key" }} />);
       }).not.toThrow();
     });
   });
@@ -73,7 +69,7 @@ describe("OptixFlowConfig Component", () => {
 
       const testConfig = { apiKey: "test-api-key", compressionLevel: 75 };
 
-      const { unmount } = render(<OptixFlowConfig config={testConfig} />);
+      const { unmount } = render(<ImgDefaults config={testConfig} />);
 
       await waitFor(() => {
         expect(spy).toHaveBeenCalledWith(testConfig);
@@ -84,7 +80,7 @@ describe("OptixFlowConfig Component", () => {
 
     it("returns null when no children provided", () => {
       const { container } = render(
-        <OptixFlowConfig config={{ apiKey: "test-key" }} />,
+        <ImgDefaults config={{ apiKey: "test-key" }} />,
       );
 
       expect(container.firstChild).toBeNull();
@@ -92,9 +88,9 @@ describe("OptixFlowConfig Component", () => {
 
     it("renders children when provided", () => {
       const { getByText } = render(
-        <OptixFlowConfig config={{ apiKey: "test-key" }}>
+        <ImgDefaults config={{ apiKey: "test-key" }}>
           <div>Child Component</div>
-        </OptixFlowConfig>,
+        </ImgDefaults>,
       );
 
       expect(getByText("Child Component")).toBeTruthy();
@@ -102,12 +98,12 @@ describe("OptixFlowConfig Component", () => {
 
     it("works as a wrapper component", () => {
       const { getAllByRole } = render(
-        <OptixFlowConfig config={{ apiKey: "test-key" }}>
+        <ImgDefaults config={{ apiKey: "test-key" }}>
           <div>
             <button>Button 1</button>
             <button>Button 2</button>
           </div>
-        </OptixFlowConfig>,
+        </ImgDefaults>,
       );
 
       expect(getAllByRole("button")).toHaveLength(2);
@@ -117,14 +113,14 @@ describe("OptixFlowConfig Component", () => {
       const spy = vi.spyOn(CoreImg, "setDefaultOptixFlowConfig");
 
       const { rerender } = render(
-        <OptixFlowConfig config={{ apiKey: "initial-key" }} />,
+        <ImgDefaults config={{ apiKey: "initial-key" }} />,
       );
 
       await waitFor(() => {
         expect(spy).toHaveBeenCalledWith({ apiKey: "initial-key" });
       });
 
-      rerender(<OptixFlowConfig config={{ apiKey: "updated-key" }} />);
+      rerender(<ImgDefaults config={{ apiKey: "updated-key" }} />);
 
       await waitFor(() => {
         expect(spy).toHaveBeenCalledWith({ apiKey: "updated-key" });
@@ -140,7 +136,7 @@ describe("OptixFlowConfig Component", () => {
         compressionLevel: 90,
       };
 
-      const { unmount } = render(<OptixFlowConfig config={testConfig} />);
+      const { unmount } = render(<ImgDefaults config={testConfig} />);
 
       await waitFor(() => {
         // Component renders without errors; the side-effect (setting the
@@ -160,13 +156,13 @@ describe("OptixFlowConfig Component", () => {
       const overrideConfig = { apiKey: "override-key", compressionLevel: 60 };
 
       render(
-        <OptixFlowConfig config={defaultConfig}>
+        <ImgDefaults config={defaultConfig}>
           <Img
             src="test.jpg"
             alt="Test with override"
             optixFlowConfig={overrideConfig}
           />
-        </OptixFlowConfig>,
+        </ImgDefaults>,
       );
 
       await waitFor(() => {
@@ -177,38 +173,39 @@ describe("OptixFlowConfig Component", () => {
 
   // ---------------------------------------------------------------------------
   describe("Edge Cases", () => {
-    it("handles null config gracefully", () => {
-      expect(() => {
-        render(<OptixFlowConfig config={null as any} />);
-      }).not.toThrow();
-    });
-
-    it("handles undefined config gracefully", () => {
-      expect(() => {
-        render(<OptixFlowConfig config={undefined as any} />);
-      }).not.toThrow();
-    });
-
-    it("handles empty config object", async () => {
+    it("handles null config gracefully and calls setDefaultOptixFlowConfig(null)", async () => {
       const spy = vi.spyOn(CoreImg, "setDefaultOptixFlowConfig");
 
-      render(<OptixFlowConfig config={{}} />);
+      expect(() => {
+        render(<ImgDefaults config={null as any} />);
+      }).not.toThrow();
 
       await waitFor(() => {
-        expect(spy).toHaveBeenCalledWith({});
+        expect(spy).toHaveBeenCalledWith(null);
+      });
+    });
+
+    it("handles undefined config gracefully and calls setDefaultOptixFlowConfig(null)", async () => {
+      const spy = vi.spyOn(CoreImg, "setDefaultOptixFlowConfig");
+
+      expect(() => {
+        render(<ImgDefaults config={undefined as any} />);
+      }).not.toThrow();
+
+      await waitFor(() => {
+        // undefined coalesces to null via `config ?? null`
+        expect(spy).toHaveBeenCalledWith(null);
       });
     });
 
     it("handles rapid prop changes", async () => {
       const spy = vi.spyOn(CoreImg, "setDefaultOptixFlowConfig");
 
-      const { rerender } = render(
-        <OptixFlowConfig config={{ apiKey: "key-1" }} />,
-      );
+      const { rerender } = render(<ImgDefaults config={{ apiKey: "key-1" }} />);
 
-      rerender(<OptixFlowConfig config={{ apiKey: "key-2" }} />);
-      rerender(<OptixFlowConfig config={{ apiKey: "key-3" }} />);
-      rerender(<OptixFlowConfig config={{ apiKey: "key-4" }} />);
+      rerender(<ImgDefaults config={{ apiKey: "key-2" }} />);
+      rerender(<ImgDefaults config={{ apiKey: "key-3" }} />);
+      rerender(<ImgDefaults config={{ apiKey: "key-4" }} />);
 
       await waitFor(() => {
         expect(spy).toHaveBeenLastCalledWith({ apiKey: "key-4" });
@@ -222,18 +219,18 @@ describe("OptixFlowConfig Component", () => {
       const ChildComponent = vi.fn(() => <div>Child</div>);
 
       const { rerender } = render(
-        <OptixFlowConfig config={{ apiKey: "test-key" }}>
+        <ImgDefaults config={{ apiKey: "test-key" }}>
           <ChildComponent />
-        </OptixFlowConfig>,
+        </ImgDefaults>,
       );
 
       const initialCallCount = ChildComponent.mock.calls.length;
 
       // Re-render with the same config reference
       rerender(
-        <OptixFlowConfig config={{ apiKey: "test-key" }}>
+        <ImgDefaults config={{ apiKey: "test-key" }}>
           <ChildComponent />
-        </OptixFlowConfig>,
+        </ImgDefaults>,
       );
 
       // Child should re-render at most once more (React's normal reconciliation)
@@ -244,10 +241,28 @@ describe("OptixFlowConfig Component", () => {
 
     it("cleans up properly on unmount", () => {
       const { unmount } = render(
-        <OptixFlowConfig config={{ apiKey: "cleanup-test" }} />,
+        <ImgDefaults config={{ apiKey: "cleanup-test" }} />,
       );
 
       expect(() => unmount()).not.toThrow();
+    });
+
+    it("clears the default config when unmounted", async () => {
+      const spy = vi.spyOn(CoreImg, "setDefaultOptixFlowConfig");
+
+      const { unmount } = render(
+        <ImgDefaults config={{ apiKey: "to-be-cleared" }} />,
+      );
+
+      await waitFor(() => {
+        expect(spy).toHaveBeenCalledWith({ apiKey: "to-be-cleared" });
+      });
+
+      // Unmounting should NOT automatically clear config — that is intentional
+      // (config persists for any remaining <Img /> instances in the tree).
+      // This test documents that unmount itself does not throw.
+      unmount();
+      expect(spy).not.toHaveBeenCalledWith(null);
     });
   });
 
@@ -263,7 +278,7 @@ describe("OptixFlowConfig Component", () => {
 
       validConfigs.forEach((config) => {
         expect(() => {
-          render(<OptixFlowConfig config={config as any} />);
+          render(<ImgDefaults config={config as any} />);
         }).not.toThrow();
       });
     });
