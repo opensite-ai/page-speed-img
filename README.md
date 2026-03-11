@@ -1,16 +1,13 @@
 # ⚡ @page-speed/img
 
-![Page Speed React Image Component](https://octane.cdn.ing/api/v1/images/transform?url=https://toastability-production.s3.amazonaws.com/gghtx0lxw9f2zigs427qc2phu024&q=85&f=avif)
+## Performance-optimized React Image component - Drop-in Image implementation of [web.dev](https://web.dev) best practices with zero configuration. Also a great alternative to [next/image](https://nextjs.org/docs/api-reference/next/image) for non-Next.js projects that still need the automated image optimization tools that the Next `Image` component provides. Utilized throughout the [OpenSite Semantic UI Platform](https://opensite.ai).
 
-> **Performance-optimized React Image component**
-
-Drop-in Image implementation of [web.dev](https://web.dev) best practices with zero configuration. Also a great alternative to [next/image](https://nextjs.org/docs/api-reference/next/image) for non-Next.js projects that still need the automated image optimization tools that the Next `Image` component provides.
+![Page Speed React Image Component](https://octane.cdn.ing/api/v1/images/transform?url=https://toastability-production.s3.amazonaws.com/gghtx0lxw9f2zigs427qc2phu024&f=webp)
 
 [![npm version](https://img.shields.io/npm/v/@page-speed/img?style=flat-square)](https://www.npmjs.com/package/@page-speed/hooks)
 [![npm downloads](https://img.shields.io/npm/dm/@page-speed/img?style=flat-square)](https://www.npmjs.com/package/@page-speed/hooks)
 [![License](https://img.shields.io/npm/l/@page-speed/img?style=flat-square)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue?style=flat-square)](./tsconfig.json)
-[![Tree-Shakeable](https://img.shields.io/badge/Tree%20Shakeable-Yes-brightgreen?style=flat-square)](#tree-shaking)
 
 [Documentation](#documentation) · [Quick Start](#quick-start) · [Hooks](#hooks) · [Examples](#examples) · [Contributing](./CONTRIBUTING.md)
 
@@ -51,6 +48,7 @@ export function HeroImage() {
 ```
 
 What you get:
+
 - Pixel-perfect primary `src` sized to the rendered element (Lighthouse “Properly size images” pass).
 - DPR-aware `srcset` (1x/2x) for AVIF/WebP/JPEG.
 - Lazy loading with IntersectionObserver; set `eager` for above-the-fold.
