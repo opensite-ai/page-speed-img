@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.7] - 2026-01-22
+
+### Added
+
+- **`OptixFlowConfig` component** — new SSR-safe React component for setting the default OptixFlow configuration at the app root level. Preferred over the imperative `setDefaultOptixFlowConfig` function in SSR/Next.js environments because config is applied inside a `useEffect` and never executed during server-side rendering. Supports optional children so it can be used as a transparent wrapper or as a standalone side-effect node.
+
+  ```tsx
+  // Recommended: component approach (SSR-safe)
+  import { OptixFlowConfig } from "@page-speed/img";
+
+  export function Providers({ children }) {
+    return (
+      <OptixFlowConfig config={{ apiKey: process.env.NEXT_PUBLIC_OPTIX_KEY }}>
+        {children}
+      </OptixFlowConfig>
+    );
+  }
+  ```
+
+- Exported `ImgProps` type from `src/core/index.ts` — it was defined and used in `Img.tsx` but not re-exported through the core barrel, making it inaccessible to consumers who imported from the package root.
+
+- `prepublishOnly` script now runs `pnpm test` in addition to `pnpm build`, ensuring the full test suite must pass before any publish can proceed.
+
+### Fixed
+
+- Removed a conditional `React.useRef` call inside `OptixFlowConfig` that violated the Rules of Hooks (hooks must not be called inside `if` blocks). The synchronous client-side config path was redundant given the `useEffect` already handles initialization; the offending block was removed entirely.
+
+---
+
 ## [0.4.5] - 2026-01-15
 
 ### Added
