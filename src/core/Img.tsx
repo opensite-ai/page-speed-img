@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, memo, useCallback, useMemo, useRef } from "react";
+import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { useOptimizedImage } from "@page-speed/hooks/media";
 import type { UseOptimizedImageOptions } from "@page-speed/hooks/media";
 import { useImgDebugLog } from "./useImgDebugLog.js";
@@ -9,7 +9,7 @@ import { useResponsiveReset } from "./useResponsiveReset.js";
 
 type NativeImgProps = Omit<
   React.ImgHTMLAttributes<HTMLImageElement>,
-  "src" | "srcSet" | "sizes"
+  "src" | "srcSet" | "sizes" | "fetchPriority"
 > & {
   src?: string;
 };
@@ -17,8 +17,8 @@ type NativeImgProps = Omit<
 export type ImgProps = NativeImgProps & {
   /** Explicit sizes attribute (otherwise derived from useOptimizedImage) */
   sizes?: string;
-  /** Force eager load (alias for loading="eager") */
-  eager?: boolean;
+  /** Fetch priority hint – maps to the HTML `fetchpriority` attribute */
+  fetchPriority?: "high" | "low" | "auto";
   /** Intersection observer threshold for lazy loading */
   intersectionThreshold?: number;
   /** Intersection observer root margin for lazy loading */
@@ -75,24 +75,25 @@ const parseDimension = (value: unknown): number | undefined => {
   return undefined;
 };
 
-const composeRefs = (
+/** Merges the hook ref, the forwarded ref, and a local ref into a single callback ref. */
+function useComposeRefs(
   hookRef: (node: HTMLImageElement | null) => void,
   forwardedRef: React.Ref<HTMLImageElement | null>,
-  localRef: React.RefObject<HTMLImageElement>,
-) =>
-  useCallback(
+  localRef: React.MutableRefObject<HTMLImageElement | null>,
+) {
+  return useCallback(
     (node: HTMLImageElement | null) => {
       hookRef(node);
-      // eslint-disable-next-line no-param-reassign
-      (localRef as any).current = node;
+      localRef.current = node;
       if (typeof forwardedRef === "function") {
         forwardedRef(node);
-      } else if (forwardedRef && typeof (forwardedRef as any) === "object") {
-        (forwardedRef as any).current = node;
+      } else if (forwardedRef && typeof forwardedRef === "object") {
+        (forwardedRef as React.MutableRefObject<HTMLImageElement | null>).current = node;
       }
     },
     [hookRef, forwardedRef, localRef],
   );
+}
 
 const ModernImg: React.FC<ForwardedImgProps> = ({
   sizes,
@@ -101,7 +102,6 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
   alt,
   title,
   src: directSrc,
-  eager,
   width,
   height,
   fetchPriority,
@@ -122,20 +122,21 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
     () => (typeof directSrc === "string" ? directSrc.trim() : ""),
     [directSrc],
   );
-  const numericWidth = useMemo(() => parseDimension(width), [width]);
-  const numericHeight = useMemo(() => parseDimension(height), [height]);
+
+  const numericWidth = parseDimension(width);
+  const numericHeight = parseDimension(height);
+
   const resolvedOptixConfig = useMemo(
     () => resolveOptixFlowConfig(optixFlowConfig),
     [optixFlowConfig],
   );
-  const eagerLoad = useMemo(() => {
-    return eager ?? loading === "eager";
-  }, [eager, loading]);
+
+  const isEagerLoad = loading === "eager";
 
   const hookOptions = useMemo(
     () => ({
       src: normalizedSrc,
-      eager: eagerLoad,
+      eager: isEagerLoad,
       width: numericWidth,
       height: numericHeight,
       rootMargin: intersectionMargin ?? "200px",
@@ -144,7 +145,7 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
     }),
     [
       normalizedSrc,
-      eagerLoad,
+      isEagerLoad,
       numericWidth,
       numericHeight,
       intersectionMargin,
@@ -163,41 +164,31 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
     size,
   } = useOptimizedImage(hookOptions);
 
-  const mergedRef = composeRefs(hookRef, forwardedRef, imgRef);
+  const mergedRef = useComposeRefs(hookRef, forwardedRef, imgRef);
 
-  const sizesAttr = useMemo(() => {
-    return sizes ?? (computedSizes || undefined);
-  }, [sizes, computedSizes]);
-  const loadingAttr = useMemo(() => {
-    return loading ?? hookLoading ?? "lazy";
-  }, [loading, hookLoading]);
-  const decodingAttr = useMemo(() => {
-    return decoding ?? "async";
-  }, [decoding]);
-  const fetchPriorityAttr = useMemo(() => {
-    return fetchPriority ?? (eagerLoad ? "high" : undefined);
-  }, [fetchPriority, eagerLoad]);
+  // Compute fetchpriority: explicit prop wins, otherwise "high" for eager loads
+  const resolvedFetchPriority = fetchPriority ?? (isEagerLoad ? "high" : undefined);
 
-  const hasSrcSet = useMemo(() => {
-    return Boolean(srcset.avif || srcset.webp || srcset.jpeg);
-  }, [srcset.avif, srcset.webp, srcset.jpeg]);
-  const imgSrc = useMemo(() => {
-    return src || normalizedSrc || TRANSPARENT_PIXEL;
-  }, [src, normalizedSrc]);
-  const inlineSrcSet = useMemo(() => {
-    return hasSrcSet && !srcset.avif && !srcset.webp ? srcset.jpeg : "";
-  }, [hasSrcSet, srcset.avif, srcset.webp, srcset.jpeg]);
+  // Apply fetchpriority via DOM API for React 18 compatibility
+  useEffect(() => {
+    const el = imgRef.current;
+    if (!el) return;
+    if (resolvedFetchPriority) {
+      el.setAttribute("fetchpriority", resolvedFetchPriority);
+    } else {
+      el.removeAttribute("fetchpriority");
+    }
+  }, [resolvedFetchPriority]);
 
-  const widthAttr = useMemo(() => {
-    return numericWidth ?? (size.width || undefined);
-  }, [numericWidth, size?.width]);
-  const heightAttr = useMemo(() => {
-    return numericHeight ?? (size.height || undefined);
-  }, [numericHeight, size?.height]);
+  // Derived values
+  const imgSrc = src || normalizedSrc || TRANSPARENT_PIXEL;
+  const hasSrcSet = Boolean(srcset.avif || srcset.webp || srcset.jpeg);
+  const inlineSrcSet = hasSrcSet && !srcset.avif && !srcset.webp ? srcset.jpeg : undefined;
+  const sizesAttr = sizes ?? computedSizes ?? undefined;
 
   useImgDebugLog({
     enabled: useDebugMode ?? false,
-    eagerLoad,
+    eagerLoad: isEagerLoad,
     isInView,
     imgSrc,
     transparentPixel: TRANSPARENT_PIXEL,
@@ -205,45 +196,28 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
     sizesAttr,
   });
 
+  // Shared img props for both render paths
+  const imgProps = {
+    ...restProps,
+    ref: mergedRef,
+    src: imgSrc,
+    loading: loading ?? hookLoading ?? "lazy",
+    decoding: decoding ?? "async",
+    alt,
+    title,
+    width: numericWidth ?? size.width ?? undefined,
+    height: numericHeight ?? size.height ?? undefined,
+  } as const;
+
   if (!hasSrcSet) {
-    return (
-      <img
-        ref={mergedRef}
-        src={imgSrc}
-        loading={loadingAttr}
-        decoding={decodingAttr}
-        fetchPriority={fetchPriorityAttr}
-        alt={alt}
-        title={title}
-        width={widthAttr}
-        height={heightAttr}
-        {...restProps}
-      />
-    );
+    return <img {...imgProps} />;
   }
 
   return (
     <picture ref={pictureRef}>
-      {srcset.avif ? (
-        <source type="image/avif" srcSet={srcset.avif} sizes={sizesAttr} />
-      ) : null}
-      {srcset.webp ? (
-        <source type="image/webp" srcSet={srcset.webp} sizes={sizesAttr} />
-      ) : null}
-      <img
-        ref={mergedRef}
-        src={imgSrc}
-        srcSet={inlineSrcSet || undefined}
-        sizes={inlineSrcSet ? sizesAttr : undefined}
-        loading={loadingAttr}
-        decoding={decodingAttr}
-        fetchPriority={fetchPriorityAttr}
-        alt={alt}
-        title={title}
-        width={widthAttr}
-        height={heightAttr}
-        {...restProps}
-      />
+      {srcset.avif && <source type="image/avif" srcSet={srcset.avif} sizes={sizesAttr} />}
+      {srcset.webp && <source type="image/webp" srcSet={srcset.webp} sizes={sizesAttr} />}
+      <img {...imgProps} srcSet={inlineSrcSet} sizes={inlineSrcSet ? sizesAttr : undefined} />
     </picture>
   );
 };

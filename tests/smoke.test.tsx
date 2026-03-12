@@ -91,7 +91,7 @@ describe("package smoke tests", () => {
           alt="Demo"
           width={480}
           height={320}
-          eager
+          loading="eager"
           optixFlowConfig={{ apiKey: "test-key" }}
         />,
       );
@@ -118,7 +118,7 @@ describe("package smoke tests", () => {
           alt="Plain"
           width={640}
           height={360}
-          eager
+          loading="eager"
         />,
       );
     });
