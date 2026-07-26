@@ -1,6 +1,13 @@
 "use client";
 
-import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { useOptimizedImage } from "@page-speed/hooks/media";
 import type { UseOptimizedImageOptions } from "@page-speed/hooks/media";
 import { useImgDebugLog } from "./useImgDebugLog.js";
@@ -88,7 +95,9 @@ function useComposeRefs(
       if (typeof forwardedRef === "function") {
         forwardedRef(node);
       } else if (forwardedRef && typeof forwardedRef === "object") {
-        (forwardedRef as React.MutableRefObject<HTMLImageElement | null>).current = node;
+        (
+          forwardedRef as React.MutableRefObject<HTMLImageElement | null>
+        ).current = node;
       }
     },
     [hookRef, forwardedRef, localRef],
@@ -167,7 +176,8 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
   const mergedRef = useComposeRefs(hookRef, forwardedRef, imgRef);
 
   // Compute fetchpriority: explicit prop wins, otherwise "high" for eager loads
-  const resolvedFetchPriority = fetchPriority ?? (isEagerLoad ? "high" : undefined);
+  const resolvedFetchPriority =
+    fetchPriority ?? (isEagerLoad ? "high" : undefined);
 
   // Apply fetchpriority via DOM API for React 18 compatibility
   useEffect(() => {
@@ -183,7 +193,8 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
   // Derived values
   const imgSrc = src || normalizedSrc || TRANSPARENT_PIXEL;
   const hasSrcSet = Boolean(srcset.avif || srcset.webp || srcset.jpeg);
-  const inlineSrcSet = hasSrcSet && !srcset.avif && !srcset.webp ? srcset.jpeg : undefined;
+  const inlineSrcSet =
+    hasSrcSet && !srcset.avif && !srcset.webp ? srcset.jpeg : undefined;
   const sizesAttr = sizes ?? computedSizes ?? undefined;
 
   useImgDebugLog({
@@ -215,9 +226,17 @@ const ModernImg: React.FC<ForwardedImgProps> = ({
 
   return (
     <picture ref={pictureRef}>
-      {srcset.avif && <source type="image/avif" srcSet={srcset.avif} sizes={sizesAttr} />}
-      {srcset.webp && <source type="image/webp" srcSet={srcset.webp} sizes={sizesAttr} />}
-      <img {...imgProps} srcSet={inlineSrcSet} sizes={inlineSrcSet ? sizesAttr : undefined} />
+      {srcset.avif && (
+        <source type="image/avif" srcSet={srcset.avif} sizes={sizesAttr} />
+      )}
+      {srcset.webp && (
+        <source type="image/webp" srcSet={srcset.webp} sizes={sizesAttr} />
+      )}
+      <img
+        {...imgProps}
+        srcSet={inlineSrcSet}
+        sizes={inlineSrcSet ? sizesAttr : undefined}
+      />
     </picture>
   );
 };

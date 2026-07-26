@@ -1,6 +1,6 @@
 {
   "name": "@page-speed/img",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "description": "Performance-optimized React Image component. Drop-in image implementation of web.dev best practices with zero configuration.",
   "keywords": [
     "react",
@@ -92,7 +92,7 @@
   },
   "dependencies": {
     "@opensite/hooks": "2.1.0",
-    "@page-speed/hooks": "0.4.5"
+    "@page-speed/hooks": "0.4.6"
   },
   "packageManager": "pnpm@10.24.0",
   "engines": {

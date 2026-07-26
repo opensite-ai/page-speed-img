@@ -76,7 +76,7 @@ import { Img } from "@page-speed/img";
   alt="A photo"
   width={800}
   height={600}
-  eager // force above-the-fold loading (optional)
+  loading="eager" // force above-the-fold loading (optional)
   optixFlowConfig={{ apiKey: "..." }} // OptixFlow config override (optional)
 />;
 ```
@@ -87,7 +87,7 @@ import { Img } from "@page-speed/img";
 - Renders a plain `<img>` when OptixFlow is disabled or no srcset is generated.
 - Returns `null` and emits a `console.warn` if `src` is falsy/empty.
 - `loading` defaults to `"lazy"`; `decoding` defaults to `"async"`.
-- `fetchPriority` is set to `"high"` automatically when `eager` is true.
+- `fetchPriority` is set to `"high"` automatically when `loading="eager"` is provided.
 
 #### `<ImgDefaults />` _(preferred approach for setting global defaults)_
 
@@ -181,23 +181,23 @@ import type { OptixFlowConfig } from "@page-speed/img"; // = UseOptimizedImageOp
 
 ### `ImgProps` reference
 
-| Prop                    | Type                          | Default     | Description                                   |
-| ----------------------- | ----------------------------- | ----------- | --------------------------------------------- |
-| `src`                   | `string`                      | —           | **Required.** Image URL.                      |
-| `alt`                   | `string`                      | —           | Alt text (passed to `<img>`).                 |
-| `width`                 | `number \| string`            | —           | Layout hint; prevents CLS.                    |
-| `height`                | `number \| string`            | —           | Layout hint; prevents CLS.                    |
-| `eager`                 | `boolean`                     | `false`     | Force eager loading + `fetchPriority="high"`. |
-| `loading`               | `"lazy" \| "eager"`           | `"lazy"`    | Native loading attribute.                     |
-| `decoding`              | `"async" \| "sync" \| "auto"` | `"async"`   | Native decoding attribute.                    |
-| `sizes`                 | `string`                      | auto        | Override computed `sizes`.                    |
-| `intersectionMargin`    | `string`                      | `"200px"`   | `rootMargin` for IntersectionObserver.        |
-| `intersectionThreshold` | `number`                      | `0.1`       | `threshold` for IntersectionObserver.         |
-| `optixFlowConfig`       | `ImgDefaults`                 | `undefined` | Per-image OptixFlow override.                 |
-| `useDebugMode`          | `boolean`                     | `false`     | Log image state to console.                   |
+| Prop                    | Type                          | Default                   | Description                                      |
+| ----------------------- | ----------------------------- | ------------------------- | ------------------------------------------------ |
+| `src`                   | `string`                      | —                         | **Required.** Image URL.                         |
+| `alt`                   | `string`                      | —                         | Alt text (passed to `<img>`).                    |
+| `width`                 | `number \| string`            | —                         | Layout hint; prevents CLS.                       |
+| `height`                | `number \| string`            | —                         | Layout hint; prevents CLS.                       |
+| `loading`               | `"lazy" \| "eager"`           | `"lazy"`                  | Native loading attribute.                        |
+| `decoding`              | `"async" \| "sync" \| "auto"` | `"async"`                 | Native decoding attribute.                       |
+| `fetchPriority`         | `"high" \| "low" \| "auto"`   | `"high"` (eager), auto    | Native fetch priority hint.                      |
+| `sizes`                 | `string`                      | auto-computed             | Override computed `sizes`.                       |
+| `intersectionMargin`    | `string`                      | `"200px"`                 | `rootMargin` for IntersectionObserver.           |
+| `intersectionThreshold` | `number`                      | `0.1`                     | `threshold` for IntersectionObserver.            |
+| `optixFlowConfig`       | `OptixFlowConfig`             | global default            | Per-image OptixFlow override.                    |
+| `useDebugMode`          | `boolean`                     | `false`                   | Log image state to console.                      |
 
 All standard `HTMLImageElement` attributes are also accepted (spread onto `<img>`), except
-`srcSet` and `sizes` which are managed internally.
+`src`, `srcSet`, `sizes`, and `fetchPriority` which are managed internally.
 
 ---
 

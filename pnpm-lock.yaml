@@ -12,8 +12,8 @@ importers:
         specifier: 2.1.0
         version: 2.1.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@page-speed/hooks':
-        specifier: 0.4.5
-        version: 0.4.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        specifier: 0.4.6
+        version: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react:
         specifier: '>=17.0.0'
         version: 19.2.0
@@ -446,8 +446,8 @@ packages:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
 
-  '@page-speed/hooks@0.4.5':
-    resolution: {integrity: sha512-1i22hEg9hQ5zt9/cEcI8A1XgoihEZvLBwOnKmCp2D4vgbXu3OqvzbMBYatWbUruYZnDo0qnw8uyB7eW6mvzHzg==}
+  '@page-speed/hooks@0.4.6':
+    resolution: {integrity: sha512-IDVTQiVKEAkZWcKfNImuznuCvhtmFYiaPpdY45FjSzgaI+ju/pdeCyKinDaZcaFHn7cARyOHTZlukYwCYzCZcg==}
     engines: {node: '>=18.0.0', pnpm: '>=9.0.0'}
     peerDependencies:
       react: '>=16.8.0'
@@ -1989,7 +1989,7 @@ snapshots:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
-  '@page-speed/hooks@0.4.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@page-speed/hooks@0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
